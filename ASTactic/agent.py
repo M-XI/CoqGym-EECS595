@@ -210,7 +210,7 @@ class Agent:
             for proof_env in file_env:  # start a proof
                 if proof_name is not None and proof_env.proof["name"] != proof_name:
                     continue
-                print("proof: ", proof_env.proof["name"])
+                # print("proof: ", proof_env.proof["name"])
                 # print('cuda memory allocated before proof: ', torch.cuda.memory_allocated(self.opts.device), file=sys.stderr)
                 success, proof_pred, time, num_tactics = self.prove(proof_env)
                 results.append(
@@ -283,8 +283,8 @@ class Agent:
                 tac = stack[-1].pop()
 
             obs = proof_env.step(tac)
-            print(obs["result"])
-            print_goals(obs)
+            # print(obs["result"])
+            # print_goals(obs)
 
             if obs["result"] == "SUCCESS":
                 script.append(tac)
@@ -311,7 +311,7 @@ class Agent:
                 stack.append([tac_template % tac.to_tokens() for tac in tactics[::-1]])
 
         obs = proof_env.step("Admitted.")
-        print(obs["result"])
+        # print(obs["result"])
         time = self.opts.timeout - obs["time_left"]
         num_tactics = self.opts.max_num_tactics - obs["num_tactics_left"]
         return False, script, time, num_tactics

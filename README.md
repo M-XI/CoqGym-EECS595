@@ -1,5 +1,11 @@
 # CoqGym
 
+## NOTE
+This is a fork of the original CoqGym repository, made in order to implement a simple ablation study of the ASTactic model below.
+The following sections consist of the original README.
+
+## START OF ORIGINAL README
+
 ![Example proof](images/example_proof.jpg)
 
 Code for the paper:  

@@ -48,8 +48,22 @@ class ContextReader(nn.Module):
                     [state.unsqueeze(0).expand(embedding.size(0), -1), embedding], dim=1
                 )
                 weights = self.linear2(self.relu1(self.linear1(input)))
-                weights = F.softmax(weights, dim=0)
-                context.append(torch.matmul(embedding.t(), weights).squeeze())
+                new_context = torch.empty(1)
+
+                if self.opts.ablation == "mean":
+                    # turns this into mean pooling (softmax basically averages)
+                    weights_override = torch.ones((embedding.size(0), 1), device=self.opts.device)
+                    weights_override = F.softmax(weights_override, dim=0)
+                    new_context = torch.matmul(embedding.t(), weights_attention).squeeze()
+                elif self.opts.ablation == "max":
+                    # turns this into max pooling
+                    new_context = torch.max(embedding.t(), dim=1).values
+                else:
+                    # normal attention
+                    weights_attention = F.softmax(weights, dim=0)
+                    new_context = torch.matmul(embedding.t(), weights).squeeze()
+                context.append(new_context)
+
         context = torch.stack(context)
         return context
 

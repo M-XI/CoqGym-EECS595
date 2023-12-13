@@ -64,6 +64,11 @@ if __name__ == "__main__":
         "--hidden_dim", type=int, default=256, help="dimension of the LSTM controller"
     )
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--sample_size", type=int, default=0)
+    parser.add_argument("--smallest_only", type=bool, default=False)
+
+    parser.add_argument("--ablation", type=str, default="")
+
     opts = parser.parse_args()
     log(opts)
     opts.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -107,11 +112,19 @@ if __name__ == "__main__":
             if md5(f.encode("utf-8")).hexdigest().startswith(opts.filter)
         ]
 
+
+    if opts.smallest_only:
+        files = sorted(files, key = os.path.getsize)
+        if opts.sample_size > 0:
+            files = files[:min(len(files), opts.sample_size)]
+    elif opts.sample_size > 0:
+        files = [files[i] for i in random.sample(range(len(files)), min(len(files), opts.sample_size))]
+
     print(files)
     results = []
     bar = ProgressBar(max_value=len(files))
     for i, f in enumerate(files):
-        print("file: ", f)
+        # print("file: ", f)
         # print('cuda memory allocated before file: ', torch.cuda.memory_allocated(opts.device), file=sys.stderr)
         results.extend(agent.evaluate(f, opts.proof))
         bar.update(i)
